@@ -33,7 +33,7 @@ def lasso_reg(train_df, test_df):
 	result.extend([lasso.intercept_])
 	result.extend(coefs)
 	# visualization
-	draw_visual(['%d' %i for i in range(1, len(coefs)+1)], coefs, 'Predictor', 'Coefficients', 'Coefficient Trajectories (Lasso Regression)')
+	draw_visual(train_df.columns[train_df.columns != 'Salary'], coefs, 'Predictor', 'Coefficients', 'Coefficient Trajectories (Lasso Regression)')
 
 def ridge_reg(train_df, test_df):
 	ridge = Ridge(normalize=True)
@@ -49,15 +49,17 @@ def ridge_reg(train_df, test_df):
 	result.extend([ridge.intercept_])
 	result.extend(coefs)
 	# visualization
-	draw_visual(['%d' %i for i in range(1, len(coefs)+1)], coefs, 'Predictor', 'Coefficients', 'Coefficient Trajectories (Ridge Regression)')
+	draw_visual(train_df.columns[train_df.columns != 'Salary'], coefs, 'Predictor', 'Coefficients', 'Coefficient Trajectories (Ridge Regression)')
 
 def draw_visual(x, y, x_label, y_label, title):
+	plt.clf()	# clear the figure before creating new
 	axes = plt.gca()
 	axes.plot(x, y)
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
 	plt.title(title)
 	plt.axis('tight')
+	plt.grid(True)
 	plt.show()
 
 def main():
