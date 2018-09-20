@@ -30,11 +30,13 @@ def lasso_reg(df, x, y):
 	# draw coefficient trajectories
 	draw_coef_traject(alphas, coefs, 'alpha', 'coefficients', 'Coefficient Trajectories (Lasso Regression)', df.columns[df.columns != 'Salary'])
 	# cross-validate and get the optimal alpha, model, and MSE
-	opt_alpha, opt_lasso, mse = cross_validate(x, y, True, alphas)
+	opt_alpha, opt_lasso, mse, train_mse = cross_validate(x, y, True, alphas)
 	# print coefficitns of optimal model to get the remaining predicators
 	pprint(opt_lasso.coef_)
-	# print optimal alpha
+	# print results
 	print('lasso optimal alpha = {}'.format(opt_alpha))
+	print('lasso optimal MSE = {}'.format(mse))
+	print('lasso train MSE = {}'.format(train_mse))
 
 def ridge_reg(df, x, y):
 	ridge = Ridge(normalize=True)
@@ -44,9 +46,12 @@ def ridge_reg(df, x, y):
 	# draw coefficient trajectories
 	draw_coef_traject(alphas, coefs, 'alpha', 'coefficients', 'Coefficient Trajectories (Ridge Regression)', df.columns[df.columns != 'Salary'])
 	# cross-validate and get the optimal alpha, model, and MSE
-	opt_alpha, opt_ridge, mse = cross_validate(x, y, False, alphas)
-	# print optimal alpha
+	opt_alpha, opt_ridge, mse, train_mse = cross_validate(x, y, False, alphas)
+	pprint(opt_ridge.coef_)
+	# print results
 	print('ridge optimal alpha = {}'.format(opt_alpha))
+	print('ridge optimal MSE = {}'.format(mse))
+	print('ridge train MSE = {}'.format(train_mse))
 
 def cross_validate(x, y, is_lasso, alphas):
 	# cross-validation to find the optimal alpha value
@@ -65,7 +70,8 @@ def cross_validate(x, y, is_lasso, alphas):
 	model.fit(x_train, y_train)
 	# compare our model's results with the real results and get MSE
 	mse = mean_squared_error(y_test, model.predict(x_test))
-	return cv.alpha_, model, mse
+	train_mse = mean_squared_error(y_train, model.predict(x_train))
+	return cv.alpha_, model, mse, train_mse
 
 def get_coefs(model, alphas, x, y):
 	coefs = []	# list to store coefficients
