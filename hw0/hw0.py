@@ -22,6 +22,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+"""
+this function performs lasso regression
+"""
 def lasso_reg(df, x, y):
 	lasso = Lasso(normalize=True, max_iter=1e5)
 	alphas = np.logspace(-3, 2, 200)	# list of alpha values
@@ -38,6 +41,9 @@ def lasso_reg(df, x, y):
 	print('lasso optimal MSE = {}'.format(mse))
 	print('lasso train MSE = {}'.format(train_mse))
 
+"""
+this function performs ridge regression
+"""
 def ridge_reg(df, x, y):
 	ridge = Ridge(normalize=True)
 	alphas = np.logspace(-4, 4, 200)	# list of alpha values
@@ -53,6 +59,9 @@ def ridge_reg(df, x, y):
 	print('ridge optimal MSE = {}'.format(mse))
 	print('ridge train MSE = {}'.format(train_mse))
 
+"""
+this function performs cross-validation
+"""
 def cross_validate(x, y, is_lasso, alphas):
 	# cross-validation to find the optimal alpha value
 	if is_lasso:
@@ -73,6 +82,9 @@ def cross_validate(x, y, is_lasso, alphas):
 	train_mse = mean_squared_error(y_train, model.predict(x_train))
 	return cv.alpha_, model, mse, train_mse
 
+"""
+this function returns the list of coefficients over different alpha values
+"""
 def get_coefs(model, alphas, x, y):
 	coefs = []	# list to store coefficients
 	# run with every alpha value and store each coefficient
@@ -82,6 +94,9 @@ def get_coefs(model, alphas, x, y):
 		coefs.append(model.coef_)
 	return coefs
 
+"""
+this function draws a coefficient trajectories
+"""
 def draw_coef_traject(x, y, x_label, y_label, title, legend):
 	plt.clf()
 	axes = plt.gca()
@@ -96,6 +111,9 @@ def draw_coef_traject(x, y, x_label, y_label, title, legend):
 	plt.axis('tight')
 	plt.show()
 
+"""
+this function prepares the dataset by removing unnecessary predicators and rows
+"""
 def prepare_dataset(file_name):
 	# select numeric predictors only from the data set
 	df = pd.read_csv(file_name).select_dtypes(include='number')
@@ -103,6 +121,9 @@ def prepare_dataset(file_name):
 	df = df.loc[df['Salary'].notnull()]
 	return df, df.loc[:, df.columns != 'Salary'].values, df['Salary'].values
 
+"""
+main function
+"""
 def main():
 	df, x, y = prepare_dataset('Hitters.csv')
 	lasso_reg(df, x, y)
