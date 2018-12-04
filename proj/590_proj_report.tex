@@ -1,6 +1,4 @@
 \documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -61,11 +59,11 @@ For this project, our group used the artificially generated dataset that are ver
 \end{itemize}
 
 \subsection{Data Structure}
-There are three classes created to store the dataset.
+There are three classes created to store the dataset.\\
 \begin{itemize}
 \item TrainTestDataSet : This class contains the DataSet object for both training and testing datasets. The build\_train\_test\_dataset function in this class can be called to build the datasets.
 \item DataSet : This class contains the list of DataElement object for a single dataset (training or testing). The build\_dataset function can be called to read and parse the given data files and create and store the DataElement object for each data file.
-\item DataElement : This class contains the variables for each attribute obtained from a single data file. There are total of five variables in each DataElement object, which are:
+\item DataElement : This class contains the variables for each attribute obtained from a single data file. There are total of five variables in each DataElement object, which are:\\
 \begin{enumerate}
 \item label : label (plate number) of a given number plate
 \item height : measured height of a given number plate
@@ -76,7 +74,7 @@ There are three classes created to store the dataset.
 \end{itemize}
 
 \subsection{Data Cleanliness}
-The cleanliness of the data were measured to avoid using any data with flaws. The following values were used to measure the cleanliness.
+The cleanliness of the data were measured to avoid using any data with flaws. The following values were used to measure the cleanliness.\\
 \begin{itemize}
 \item Data Redundancy : There may exist redundant data in both training and testing dataset. This can result giving more weights to this redundant data while training the model. Therefore, our group should investigate, detect and remove redundant data from the combined dataset. This operation will improve data quality and make data analysis process more accurate.
 \item Data Missing : There may exist data that are missing key attribute values. Our group will remove those data to improve the overall quality of the dataset.
@@ -85,7 +83,7 @@ The cleanliness of the data were measured to avoid using any data with flaws. Th
 Due to the above reasons, our group will create functions to clean the combined dataset to maximize the overall quality of our analyses. However, surprisingly, the dataset were already clean enough. Further analysis on this will be explained below.
 
 \subsection{Data Cleaning Process Logic}
-The following are the steps our group followed to resolve and measure the cleanliness issue on the dataset:
+The following are the steps our group followed to resolve and measure the cleanliness issue on the dataset:\\
 \begin{enumerate}
 \item In the process of reading and parsing each data file, verify the cleanliness of this data using the valid\_json function in DataSet class using the below steps.
 \item Check if the given data has any missing attribute values (label and size of the given number plate).
@@ -93,13 +91,13 @@ The following are the steps our group followed to resolve and measure the cleanl
 \item Check if the given data already exists in the dataset.
 \item If the given data violates any of the above steps from step 2) to 4), our group dropped this data from the dataset.
 \end{enumerate}
-
-\subsection{Methods}
+\raggedbottom
+\section{Methods}
 Our model combines the structure of both CNN and RNN. Our team first used CNN to extract the most important features and used LSTM over the RNN model. In CNN, we performed the convolution twice followed by a (2, 2) Average Pooling for each convolution. After this, we reshaped the layer to make it become 38 x 128 x 1 layer structure. We then create a fully connected layer, a dense layer, for the input of the RNN. The shape of the input of RNN is 38 x 16. For simplification, we named the two layer nodes in the layer just after the 38 x 16 layer to be 1-1 and 1-2, and the 4 layer nodes after the layer containing 1-1 and 1-2 to be 2-1, 2-2, 2-3, and 2-4. Also, the two layer nodes after that are named 3-1 and 3-2. In RNN, we do forward LSTM and backward LSTM to the input of RNN, so we have layer node 1-1 and 1-2 after the input layer of RNN. After this process, we repeat the same procedures again. We do forward LSTM and backward LSTM to both layer node 1-1 and layer node 1-2. Now, we have four 38 x 128 layers in our RNN model. We then add layer nodes 2-1 and 2-2 to get layer node 3-1 as a result, and add layer nodes 2-3 and 2-4 which outputs layer node 3-2. Then, we concatenate layer node 3-1 and layer node 3-2 to come up with a 38 x 256 layer and dense the layer to achieve a 38 x 23 layer. We then apply softmax function to the layer and use CTC Loss function at the end. We will explain further on why we dense the layer to achieve 38 x 23 layer later in this paper.
-
+\\ \\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{model_diagram}
+\includegraphics[scale=0.08]{model_diagram}
 \caption{The structure (CNN + RNN) of the model}
 \end{figure}
 
@@ -109,38 +107,38 @@ Our model combines the structure of both CNN and RNN. Our team first used CNN to
 \caption{The probability distribution of the corresponding license plate}
 \end{figure}
 
-\subsection{Results}
+\section{Results}
 In order to shorten the total execution time, our group decided to only select 1/5 of random training data to train our model. However, once we came up with the better design of our model, we trained and tested the model with the complete set of dataset.
 After training our model using with the half (11,382) of the total dataset, we tested the model with the other half (11,382) of the total dataset. Out of 11,382 number plates we tested, our model correctly recognized and identified all the characters in 11,344 number plates. The accuracy for this experiment was 99.67\%.
 
-\subsection{Discussion of Results}
+\section{Discussion of Results}
 There are four different cases of character misclassification in our model as a result of testing 11,382 datasets.
 \begin{enumerate}
 \item M-H case (33 cases)	\\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{table_1}
+\includegraphics[scale=0.24]{table_1}
 \caption{Misclassified character M to H}
 \end{figure}
 
 \item M-K case (2 cases)	\\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{table_2}
+\includegraphics[scale=0.5]{table_2}
 \caption{Misclassified character M to K}
 \end{figure}
 
 \item O-C case (2 cases)	\\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{table_3}
+\includegraphics[scale=0.5]{table_3}
 \caption{Misclassified character O to C}
 \end{figure}
 
 \item Etc case (1 case)\\
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{table_2}
+\includegraphics[scale=0.5]{table_2}
 \caption{Other misclassified cases}
 \end{figure}
 
@@ -156,11 +154,11 @@ In 1-2-4-2-1 LSTM structure, if we set the pooling size to (4,4) and perform the
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.4]{table_6}
+\includegraphics[scale=0.19]{table_6}
 \caption{The comparison table for different pooling and different layer structure}
 \end{figure}
 
-\subsection{Conclusions}
+\section{Conclusions}
 The most challenging and important part on building our model was making pairs of the LSTM in RNN process, since one of them is forward and the other one is backward. Our team then added them up or performed concatenation. We would have gotten a very different result with a low accuracy if we did not insert the backward LSTM layer to our model. As our future work, we will put more effort on simplifying our model design to enhance the overall performance on training the model especially to reduce to total execution time. In addition, we want to test our model with various kinds of RNN models and other activation functions to verify whether we can come up with the model that can increase the accuracy on recognizing the characters on the number plate.
 
 \begin{thebibliography}{00}
