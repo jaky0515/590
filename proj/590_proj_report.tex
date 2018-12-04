@@ -7,6 +7,8 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{float}
+\graphicspath{ {./images/} }
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
@@ -50,7 +52,7 @@ As years pass by, things that were done manually with human’s hands gets autom
 \end{itemize}
 
 \section{Datasets}
-For this project, our group used the artificially generated dataset that are very similar to the real world vehicle number plates. This dataset were downloaded from Supervisely website. The dataset contains total of 22,768 files, where half of the files are in JSON format and another half in PNG format. Out of 22,768 files, our group decided to use 21,644 files to train the models, and the rest (1,124 files) to test the models.
+For this project, our group used the artificially generated dataset that are very similar to the real world vehicle number plates. This dataset were downloaded from Supervisely website. The dataset contains total of 22,764 files, where half of the files are in JSON format and another half in PNG format. Out of 22,764 files, our group decided to use half of the files (11,382 files) to train the model and another half (11,382 files) to test our model.
 
 \subsection{File Types}
 \begin{itemize}
@@ -92,36 +94,74 @@ The following are the steps our group followed to resolve and measure the cleanl
 \item If the given data violates any of the above steps from step 2) to 4), our group dropped this data from the dataset.
 \end{enumerate}
 
-\subsection{Figures and Tables}
-\paragraph{Positioning Figures and Tables} Place figures and tables at the top and 
-bottom of columns. Avoid placing them in the middle of columns. Large 
-figures and tables may span across both columns. Figure captions should be 
-below the figures; table heads should appear above the tables. Insert 
-figures and tables after they are cited in the text. Use the abbreviation 
-``Fig.~\ref{fig}'', even at the beginning of a sentence.
+\subsection{Methods}
+Our model combines the structure of both CNN and RNN. Our team first used CNN to extract the most important features and used LSTM over the RNN model. In CNN, we performed the convolution twice followed by a (2, 2) Average Pooling for each convolution. After this, we reshaped the layer to make it become 38 x 128 x 1 layer structure. We then create a fully connected layer, a dense layer, for the input of the RNN. The shape of the input of RNN is 38 x 16. For simplification, we named the two layer nodes in the layer just after the 38 x 16 layer to be 1-1 and 1-2, and the 4 layer nodes after the layer containing 1-1 and 1-2 to be 2-1, 2-2, 2-3, and 2-4. Also, the two layer nodes after that are named 3-1 and 3-2. In RNN, we do forward LSTM and backward LSTM to the input of RNN, so we have layer node 1-1 and 1-2 after the input layer of RNN. After this process, we repeat the same procedures again. We do forward LSTM and backward LSTM to both layer node 1-1 and layer node 1-2. Now, we have four 38 x 128 layers in our RNN model. We then add layer nodes 2-1 and 2-2 to get layer node 3-1 as a result, and add layer nodes 2-3 and 2-4 which outputs layer node 3-2. Then, we concatenate layer node 3-1 and layer node 3-2 to come up with a 38 x 256 layer and dense the layer to achieve a 38 x 23 layer. We then apply softmax function to the layer and use CTC Loss function at the end. We will explain further on why we dense the layer to achieve 38 x 23 layer later in this paper.
 
-\begin{table}[htbp]
-\caption{Table Type Styles}
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-\textbf{Table}&\multicolumn{3}{|c|}{\textbf{Table Column Head}} \\
-\cline{2-4} 
-\textbf{Head} & \textbf{\textit{Table column subhead}}& \textbf{\textit{Subhead}}& \textbf{\textit{Subhead}} \\
-\hline
-copy& More table copy$^{\mathrm{a}}$& &  \\
-\hline
-\multicolumn{4}{l}{$^{\mathrm{a}}$Sample of a Table footnote.}
-\end{tabular}
-\label{tab1}
-\end{center}
-\end{table}
-
-\begin{figure}[htbp]
-\centerline{}
-\caption{Example of a figure caption.}
-\label{fig}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{model_diagram}
+\caption{The structure (CNN + RNN) of the model}
 \end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{prob_dist}
+\caption{The probability distribution of the corresponding license plate}
+\end{figure}
+
+\subsection{Results}
+In order to shorten the total execution time, our group decided to only select 1/5 of random training data to train our model. However, once we came up with the better design of our model, we trained and tested the model with the complete set of dataset.
+After training our model using with the half (11,382) of the total dataset, we tested the model with the other half (11,382) of the total dataset. Out of 11,382 number plates we tested, our model correctly recognized and identified all the characters in 11,344 number plates. The accuracy for this experiment was 99.67\%.
+
+\subsection{Discussion of Results}
+There are four different cases of character misclassification in our model as a result of testing 11,382 datasets.
+\begin{enumerate}
+\item M-H case (33 cases)	\\
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{table_1}
+\caption{Misclassified character M to H}
+\end{figure}
+
+\item M-K case (2 cases)	\\
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{table_2}
+\caption{Misclassified character M to K}
+\end{figure}
+
+\item O-C case (2 cases)	\\
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{table_3}
+\caption{Misclassified character O to C}
+\end{figure}
+
+\item Etc case (1 case)\\
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{table_2}
+\caption{Other misclassified cases}
+\end{figure}
+
+\end{enumerate}
+For most of the misclassified license plate containing M in the beginning, our model misclassified it to the character H or K. In addition, the model also misclassified some of the character O to C.
+
+In the works of Supervisely, they used two max pooling after each CNN layer. After that, they used two of 512 x 32 GRU layers, and added them up to achieve a 512 x 32 layer. Then, they performed GRU again to this layer to come up with two of 512 x 32 GRU layers. This time, they used concatenate method to make their two layers to acquire a 1024 x 32 layer. The structure that they used looks like a 1-2-1-2-1 structure.
+
+In our model, we created our own methods to come up with different model design. First, we used an average pooling in the CNN process. In RNN, we first made the dense layer to achieve two of 128 x 38 LSTM layers, and perform LSTM to each one of them to achieve four of 128 x 38 LSTM layer. Our team then added the first and second layer (layer\_add\_1) and added the third and fourth layer (layer\_add\_2). Next, we concatenated the two layers (layer\_add\_1 and layer\_add\_2). Our structure looks like a 1-2-4-2-1 structure. This model resulted a 99.67\% accuracy with the filters equal to 64, 128, and 256 in RNN.
+In addition, our group also performed the 1-2-1-2-1 LSTM RNN experiment. As a result, the model output an accuracy equivalent to 97\%. The results of 1-2-1-2-1 and 1-2-4-2-1 structures were very similar. However, when we modified our pooling layer by changing the number of layers to one and pooling size to (4, 4), two structures resulted slightly different outcomes.
+In 1-2-1-2-1 LSTM structure, if we set the pooling size to (4, 4) and perform the average pooling once, then the accuracy now became 86\%. However, if we set the pooling size to (2, 2), and perform pooling twice, the accuracy became 97\%.
+In 1-2-4-2-1 LSTM structure, if we set the pooling size to (4,4) and perform the average pooling once, the accuracy became 97\%. However, if we set the pooling size to (2,2), and we perform pooling twice, the accuracy became 99\%.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{table_6}
+\caption{The comparison table for different pooling and different layer structure}
+\end{figure}
+
+\subsection{Conclusions}
+The most challenging and important part on building our model was making pairs of the LSTM in RNN process, since one of them is forward and the other one is backward. Our team then added them up or performed concatenation. We would have gotten a very different result with a low accuracy if we did not insert the backward LSTM layer to our model. As our future work, we will put more effort on simplifying our model design to enhance the overall performance on training the model especially to reduce to total execution time. In addition, we want to test our model with various kinds of RNN models and other activation functions to verify whether we can come up with the model that can increase the accuracy on recognizing the characters on the number plate.
 
 \begin{thebibliography}{00}
 \bibitem{b1} “Optical character recognition”, Wikipedia, The Free ENcyclopedia. Wikipedia, The Free Encyclopedia, 28 Nov. 2018. Web. 30 Nov. 2018.
